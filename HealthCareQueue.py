@@ -24,13 +24,13 @@ class HealthCareQueue:
         return self.queue
 
     def delete_user(self, user_id):
-        self.queue = [x for x in self.queue if x.user_id != user_id]
+        self.queue = [x for x in self.queue if x.id != user_id]
         return self.queue
 
     def add_patient(self, patient_data: HealthCareData):
         self.patient_db.add_patient(patient_data)
         patientIdList = self.patient_db.search_k_nearest_patient(
-            patient_data.get_id(), 5
+            patient_data.id, 5
         )
         patientPosition = [x for x in self.queue if x.id in patientIdList]
         averagePosition = sum(patientPosition) / len(patientPosition)

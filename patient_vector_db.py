@@ -58,11 +58,37 @@ class DBFiller:
                     "SyntheticDenver/" + subF + "/" + file
                 )
                 patient_id = fData["entry"][0]["resource"]["id"]
-                patient_name = (
-                    fData["entry"][0]["resource"]["name"][0]["given"]
-                    + " "
-                    + fData["entry"][0]["resource"]["name"][0]["family"]
-                )
+                try:
+                    if isinstance(fData["entry"][0]["resource"]["name"], list):
+                        try:
+                            family_name = fData["entry"][0]["resource"][
+                                "name"
+                            ][0]["family"]
+                        except KeyError:
+                            family_name = "Unknown"
+                        try:
+                            given_name = fData["entry"][0]["resource"]["name"][
+                                0
+                            ]["given"]
+                        except KeyError:
+                            given_name = "Unknown"
+                    else:
+                        try:
+                            family_name = fData["entry"][0]["resource"][
+                                "name"
+                            ]["family"]
+                        except KeyError:
+                            family_name = "Unknown"
+                        try:
+                            given_name = fData["entry"][0]["resource"]["name"][
+                                "given"
+                            ]
+                        except KeyError:
+                            given_name = "Unknown"
+                except:
+                    family_name = "Unknown"
+                    given_name = "Unknown"
+                patient_name = str(given_name) + " " + str(family_name)
                 patient_cond = []
                 patient_obs = {}
                 for entry in fData["entry"]:
@@ -84,7 +110,9 @@ class DBFiller:
                 )
                 for key in patient_obs.keys():
                     patient_vector[key] = patient_obs[key]
-                self.patientDB.add_patient_vector(patient_id, patient_vector)
+                self.patientDB.add_patient_vector(
+                    patient_name, patient_id, patient_vector
+                )
 
         return self.patientDB
 
@@ -154,9 +182,9 @@ class PatientVectorDB:
         pos = self.id_to_pos[patient_id]
         vector = self.index.reconstruct(pos)
         patient_health_data = HealthCareData(
-            patient_id,
-            self.patient_names[patient_id],
-            self.get_conditions_from_vector(vector),
+            id=patient_id,
+            name=self.patient_names[patient_id],
+            conditions=self.get_conditions_from_vector(vector),
         )
         return patient_health_data
 
