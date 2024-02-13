@@ -13,12 +13,13 @@ const reorder = <T,>(list: T[], startIndex: number, endIndex: number): T[] => {
 };
 
 const CardQueue = () => {
-  const { all, setAll } = useDataProvider();
+  const { all, setAll, swap } = useDataProvider();
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
     const { source, destination } = result;
+    swap(all[source.index].id, all[destination.index].id);
     setAll(reorder(all, source.index, destination.index));
   }
 
