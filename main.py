@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from HealthCareData import HealthCareData
 from HealthCareQueue import HealthCareQueue
+from patient_vector_db import PatientVectorDB, DBFiller
 
 app = FastAPI()
 
@@ -11,7 +12,9 @@ DELETE /user
 POST /patient 
 """
 
-health_care_queue = HealthCareQueue()
+dbfiller = DBFiller()
+db = dbfiller.fillDB()
+health_care_queue = HealthCareQueue(db)
 
 
 @app.get("/queue")
