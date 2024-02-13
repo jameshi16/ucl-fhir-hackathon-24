@@ -35,14 +35,16 @@ class DBFiller:
         self.obsList = list(obsSet)
         self.condList.sort()
         self.obsList.sort()
-    def createPatientVector(self, patient_id, fData):
+
+
+    def create_patient_vector(self, patient_id, fData):
         patient_vector = np.zeros(len(self.condList) + len(self.obsList))
         for entry in fData["entry"]:
             if entry["resource"]["resourceType"] == "Condition":
                 index = self.condList.index(entry["resource"]["code"]["text"])
                 patient_vector[index] = 1
             if entry["resource"]["resourceType"] == "Observation":
-                index = self.obsList.index(entry["resource"]["code"]["text")
+                index = self.obsList.index(entry["resource"]["code"]["text"])
                 try:
                     patient_vector[index + len(self.condList)] = entry[
                         "resource"
@@ -60,26 +62,8 @@ class DBFiller:
                 fData = self.getDataAsJson(
                     "SyntheticDenver/" + subF + "/" + file
                 )
-                patient_vector = np.zeros(
-                    len(self.condList) + len(self.obsList)
-                )
                 patient_id = fData["entry"][0]["resource"]["id"]
-                for entry in fData["entry"]:
-                    if entry["resource"]["resourceType"] == "Condition":
-                        index = self.condList.index(
-                            entry["resource"]["code"]["text"]
-                        )
-                        patient_vector[index] = 1
-                    if entry["resource"]["resourceType"] == "Observation":
-                        index = self.obsList.index(
-                            entry["resource"]["code"]["text"]
-                        )
-                        try:
-                            patient_vector[index + len(self.condList)] = entry[
-                                "resource"
-                            ]["valueQuantity"]["value"]
-                        except KeyError:
-                            patient_vector[index + len(self.condList)] = 1
+                patient_vector = self.create_patient_vector(patient_id, fData)
                 self.patientDB.add_patient(patient_id, patient_vector)
 
         return self.patientDB

@@ -1,5 +1,5 @@
 from HealthCareData import HealthCareData
-from patient_vector_db import PatientVectorDB
+from patient_vector_db import PatientVectorDB, DBFiller
 
 class HealthCareQueue:
     def __init__(self, initial_queue=None):
@@ -19,8 +19,9 @@ class HealthCareQueue:
         return self.queue
 
     def add_patient(self, patient_data: HealthCareData):
-        #
-        patientIdList = PatientVectorDB.search_k_nearest(patient_data, 1)
+
+        patient_vector = DBFiller.create_patient_vector(patient_data)
+        patientIdList = PatientVectorDB.search_k_nearest(patient_vector, 1)
         patientPosition = [x for x in self.queue if x.id in patientIdList]
         averagePosition = sum(patientPosition) / len(patientPosition)
 
