@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from HealthCareData import HealthCareData
 from HealthCareQueue import HealthCareQueue
 from patient_vector_db import PatientVectorDB, DBFiller
@@ -14,7 +15,19 @@ POST /patient
 
 dbfiller = DBFiller()
 db = dbfiller.fillDB()
+# pkl the db
+# db.save_db("patientDB.pkl")
 health_care_queue = HealthCareQueue(db)
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/queue")
@@ -34,4 +47,7 @@ def delete_user(user_id: str):
 
 @app.post("/patient/{patientData}")
 def add_patient(patientData: HealthCareData):
-    return health_care_queue.add_patient(patientData)
+    patient = HealthCareData(
+        patientData["id"], patientData["name"], patientData["conditions"]
+    )
+    return health_care_queue.add_patient(patient)

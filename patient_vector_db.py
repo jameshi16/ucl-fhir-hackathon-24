@@ -58,6 +58,11 @@ class DBFiller:
                     "SyntheticDenver/" + subF + "/" + file
                 )
                 patient_id = fData["entry"][0]["resource"]["id"]
+                patient_name = (
+                    fData["entry"][0]["resource"]["name"][0]["given"]
+                    + " "
+                    + fData["entry"][0]["resource"]["name"][0]["family"]
+                )
                 patient_cond = []
                 patient_obs = {}
                 for entry in fData["entry"]:
@@ -89,6 +94,7 @@ class PatientVectorDB:
         self.vector_dim = vector_dim
         self.index = faiss.IndexFlatL2(vector_dim)
         self.patient_ids = []
+        self.patient_names = {}
         self.id_to_pos = {}  # Maps patient IDs to their position in the index
         self.obs_list = obs_list
         self.cond_list = cond_list
@@ -102,18 +108,23 @@ class PatientVectorDB:
 
         return patient_vector
 
-    def add_patient_vector(self, patient_id: str, vector: np.ndarray):
+    def add_patient_vector(
+        self, patient_name: str, patient_id: str, vector: np.ndarray
+    ):
         if patient_id in self.id_to_pos:
             print(f"Patient ID {patient_id} already exists. Use a unique ID.")
             return
         faiss.normalize_L2(vector.reshape(1, -1))
         self.index.add(vector.reshape(1, -1))
         self.patient_ids.append(patient_id)
+        self.patient_names[patient_id] = patient_name
         self.id_to_pos[patient_id] = len(self.patient_ids) - 1
 
     def add_patient(self, patient: HealthCareData):
         patient_vector = self.create_patient_vector(patient.get_conditions())
-        self.add_patient_vector(patient.get_id(), patient_vector)
+        self.add_patient_vector(
+            patient.get_name(), patient.get_id(), patient_vector
+        )
 
     def remove_patient(self, patient_id: str):
         if patient_id not in self.id_to_pos:
@@ -136,7 +147,22 @@ class PatientVectorDB:
         vector = self.index.reconstruct(pos)
         return self.search_k_nearest_vector(vector, k)
 
+    def get_patient(self, patient_id: str):
+        if patient_id not in self.id_to_pos:
+            print(f"Patient ID {patient_id} not found.")
+            return
+        pos = self.id_to_pos[patient_id]
+        vector = self.index.reconstruct(pos)
+        patient_health_data = HealthCareData(
+            patient_id,
+            self.patient_names[patient_id],
+            self.get_conditions_from_vector(vector),
+        )
+        return patient_health_data
 
-vector_dim = 4  # Number of possible vitals / symptoms
-dbFiller = DBFiller()
-db = dbFiller.fillDB()
+    def get_conditions_from_vector(self, vector: np.ndarray):
+        conditions = []
+        for i, val in enumerate(vector):
+            if val == 1:
+                conditions.append(self.cond_list[i])
+        return conditions
