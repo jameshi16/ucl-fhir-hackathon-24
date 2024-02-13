@@ -15,6 +15,8 @@ POST /patient
 
 dbfiller = DBFiller()
 db = dbfiller.fillDB()
+# pkl the db
+# db.save_db("patientDB.pkl")
 health_care_queue = HealthCareQueue(db)
 
 origins = ["*"]
@@ -44,7 +46,7 @@ def delete_user(user_id: str):
 
 
 @app.post("/patient/{patientData}")
-def add_patient(patientData):
+def add_patient(patientData: HealthCareData):
     patient = HealthCareData(
         patientData["id"], patientData["name"], patientData["conditions"]
     )

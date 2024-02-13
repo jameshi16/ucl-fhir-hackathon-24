@@ -8,6 +8,7 @@ class HealthCareQueue:
             initial_queue = []
         self.queue = initial_queue
         self.patient_db = patient_db
+        self.init_random_queue(10)
 
     def get_queue(self):
         return self.queue
