@@ -1,10 +1,8 @@
 import { Button } from "@nextui-org/react";
 
-const AddButton = () => {
+const AddButton = ({ onClick }: { onClick: () => void }) => {
   return (
-    <Button aria-label="Queue New User">
-      Queue New User
-    </Button>
+    <Button aria-label="Queue New User" onClick={onClick}>Queue New User</Button >
   );
 }
 
