@@ -46,7 +46,7 @@ class DBFiller:
                     "SyntheticDenver/" + subF + "/" + file
                 )
                 patient_vector = np.zeros(
-                    len(self.condList) + len(self.obsList)
+                    len(self.condList) + len(self.obsList), dtype="float32"
                 )
                 patient_id = fData["entry"][0]["resource"]["id"]
                 for entry in fData["entry"]:
@@ -60,9 +60,9 @@ class DBFiller:
                             entry["resource"]["code"]["text"]
                         )
                         try:
-                            patient_vector[index + len(self.condList)] = entry[
-                                "resource"
-                            ]["valueQuantity"]["value"]
+                            patient_vector[index + len(self.condList)] = int(
+                                entry["resource"]["valueQuantity"]["value"]
+                            )
                         except KeyError:
                             patient_vector[index + len(self.condList)] = 1
                 self.patientDB.add_patient(patient_id, patient_vector)
@@ -79,7 +79,7 @@ class PatientVectorDB:
 
     def add_patient(self, patient_id: str, vector: np.ndarray):
         if patient_id in self.id_to_pos:
-            print(f"Patient ID {patient_id} already exists. Use a unique ID.")
+            # print(f"Patient ID {patient_id} already exists. Use a unique ID.")
             return
         faiss.normalize_L2(vector.reshape(1, -1))
         self.index.add(vector.reshape(1, -1))
@@ -100,8 +100,6 @@ class PatientVectorDB:
         return nearest_ids, D
 
 
-vector_dim = 4  # Number of possible vitals / symptoms
-dbFiller = DBFiller()
-db = dbFiller.fillDB()
-
-print(db.search_k_nearest(np.array([1, 0, 0, 0]), 3))
+if __name__ == "__main__":
+    dbFiller = DBFiller()
+    db = dbFiller.fillDB()
