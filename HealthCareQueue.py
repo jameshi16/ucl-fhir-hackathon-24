@@ -1,5 +1,5 @@
 from HealthCareData import HealthCareData
-
+from patient_vector_db import PatientVectorDB
 
 class HealthCareQueue:
     def __init__(self, initial_queue=None):
@@ -20,10 +20,10 @@ class HealthCareQueue:
 
     def add_patient(self, patient_data: HealthCareData):
         #
-        patientIdList = []  # initialized from database
+        patientIdList = PatientVectorDB.search_k_nearest(patient_data, 1)
         patientPosition = [x for x in self.queue if x.id in patientIdList]
         averagePosition = sum(patientPosition) / len(patientPosition)
-        # shift the queue to the right by averagePosition
+
         queueLeft = [x for x in self.queue if x.priority > averagePosition]
         queueRight = [x for x in self.queue if x.priority <= averagePosition]
         queueLeft.append(patient_data)
