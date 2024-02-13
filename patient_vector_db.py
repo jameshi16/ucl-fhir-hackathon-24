@@ -36,7 +36,6 @@ class DBFiller:
         self.condList.sort()
         self.obsList.sort()
 
-
     def create_patient_vector(self, patient_id, fData):
         patient_vector = np.zeros(len(self.condList) + len(self.obsList))
         for entry in fData["entry"]:
