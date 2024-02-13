@@ -30,6 +30,7 @@ const QueuePage = () => {
       name,
       conditions
     } as HealthCareData);
+    setIsOpen(false);
   };
 
   return (

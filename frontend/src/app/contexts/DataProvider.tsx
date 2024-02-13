@@ -50,7 +50,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const response = await axios.post(process.env.NEXT_PUBLIC_BASE_URL + `/reorder?id1=${index1}&id2=${index2}`);
       if (response.status === 200) {
-        fetchDataFromServer();
+        //      fetchDataFromServer();
       }
     } catch (error) {
       console.error(error);
@@ -58,21 +58,27 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const deleteUser = async (id: string) => {
+    setData(data.filter((item) => item.id !== id));
     try {
       const response = await axios.delete(process.env.NEXT_PUBLIC_BASE_URL + `/user/delete?id=${id}`);
       if (response.status === 200) {
-        fetchDataFromServer();
+        //    fetchDataFromServer();
       }
     } catch (error) {
       console.error(error);
     }
   }
 
-  const addUser = async (data: HealthCareData) => {
+  const addUser = async (datum: HealthCareData) => {
+    const newData = [...data];
+    const insertAt = Math.floor(Math.random() * (newData.length));
+    newData.splice(insertAt, 0, datum);
+    setData(newData);
+
     try {
-      const response = await axios.post(process.env.NEXT_PUBLIC_BASE_URL + '/user/add', data);
+      const response = await axios.post(process.env.NEXT_PUBLIC_BASE_URL + '/patient/123', datum);
       if (response.status === 200) {
-        fetchDataFromServer();
+        //  fetchDataFromServer();
       }
     } catch (error) {
       console.error(error);
@@ -80,7 +86,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   useEffect(() => {
-    fetchDataFromServer();
+    //    fetchDataFromServer();
   }, []);
 
   return (
