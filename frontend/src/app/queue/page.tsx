@@ -33,10 +33,10 @@ const QueuePage = () => {
   };
 
   return (
-    <div>
+    <div className="m-6">
       <h1 className="text-2xl text-center my-4">Current Queue</h1>
-      <CardQueue />
       <AddButton onClick={handleAdd} />
+      <CardQueue />
       <AddUserDialog
         isOpen={isOpen}
         setIsOpen={setIsOpen}
