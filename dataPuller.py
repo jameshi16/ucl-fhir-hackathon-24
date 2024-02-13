@@ -15,7 +15,7 @@ class DataPuller:
 
     def pullData(self):
         resSet = set()
-        for subF in subFolders:
+        for subF in self.subFolders:
             for file in os.listdir('synthetic_denver/' + subF):
                 fData = self.getDataAsJson('synthetic_denver/' + subF + '/' + file)
                 for entry in fData['entry']:
