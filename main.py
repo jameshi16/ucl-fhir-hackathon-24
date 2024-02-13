@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from HealthCareData import HealthCareData
 from HealthCareQueue import HealthCareQueue
@@ -35,8 +35,8 @@ def get_queue():
     return health_care_queue.get_queue()
 
 
-@app.post("/reorder/{id1, id2}")
-def reorder_queue(id1, id2):
+@app.post("/reorder")
+def reorder_queue(id1: int, id2: int):
     return health_care_queue.reorder_queue(id1, id2)
 
 
@@ -45,9 +45,6 @@ def delete_user(user_id: str):
     return health_care_queue.delete_user(user_id)
 
 
-@app.post("/patient/{patientData}")
+@app.post("/patient")
 def add_patient(patientData: HealthCareData):
-    patient = HealthCareData(
-        patientData["id"], patientData["name"], patientData["conditions"]
-    )
-    return health_care_queue.add_patient(patient)
+    return health_care_queue.add_patient(patientData)
