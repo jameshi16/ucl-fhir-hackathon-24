@@ -3,6 +3,8 @@
 import React from 'react';
 import type HealthCareData from '../types/healthcaredata';
 import { DraggableProvided } from 'react-beautiful-dnd';
+import { Button } from '@nextui-org/react';
+import { useDataProvider } from '../contexts/DataProvider';
 
 type CardProps = {
   data: HealthCareData;
@@ -11,6 +13,11 @@ type CardProps = {
 }
 
 const Card = ({ data, position, provided }: CardProps) => {
+  const { deleteUser } = useDataProvider();
+  const handleDelete = () => {
+    deleteUser(data.id);
+  }
+
   return (
     <div ref={provided.innerRef}
       {...provided.draggableProps}
@@ -25,6 +32,7 @@ const Card = ({ data, position, provided }: CardProps) => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <b>{data.name}</b>
           <span>Position: {position + 1}</span> {/* plus 1 because index is 0 based */}
+          <Button color="danger" onClick={handleDelete}>Delete</Button>
         </div>
         <p>{data.conditions.join(', ')}</p>
       </div>
