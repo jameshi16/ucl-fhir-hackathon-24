@@ -46,7 +46,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const swapServer = async (index1: string, index2: string) => {
+  const swapServer = async (index1: number, index2: number) => {
     try {
       const response = await axios.post(process.env.NEXT_PUBLIC_BASE_URL + `/reorder?id1=${index1}&id2=${index2}`);
       if (response.status === 200) {
@@ -60,7 +60,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const deleteUser = async (id: string) => {
     setData(data.filter((item) => item.id !== id));
     try {
-      const response = await axios.delete(process.env.NEXT_PUBLIC_BASE_URL + `/user/delete/${id}`);
+      const response = await axios.delete(process.env.NEXT_PUBLIC_BASE_URL + `/user/${id}`);
       if (response.status === 200) {
         fetchDataFromServer();
       }

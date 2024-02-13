@@ -19,7 +19,7 @@ const CardQueue = () => {
     if (!result.destination) return;
 
     const { source, destination } = result;
-    swap(all[source.index].id, all[destination.index].id);
+    swap(source.index, destination.index);
     setAll(reorder(all, source.index, destination.index));
   }
 
