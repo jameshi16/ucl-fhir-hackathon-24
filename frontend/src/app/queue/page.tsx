@@ -4,11 +4,14 @@ import { useState } from 'react';
 import CardQueue from "../components/card-queue";
 import AddButton from "../components/add-button";
 import AddUserDialog from "../components/add-user-dialog";
+import { useDataProvider } from "../contexts/DataProvider";
+import type HealthCareData from '../types/healthcaredata';
 
 const QueuePage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [conditions, setConditions] = useState<String[]>([]);
+  const { addData } = useDataProvider();
 
   const handleAdd = () => {
     setName('');
@@ -21,6 +24,12 @@ const QueuePage = () => {
       alert("not enough info");
       return;
     }
+
+    addData({
+      id: String(Date.now()),
+      name,
+      conditions
+    } as HealthCareData);
   };
 
   return (

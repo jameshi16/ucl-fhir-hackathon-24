@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 import Card from '@/app/components/card';
+import { useDataProvider } from "../contexts/DataProvider";
 
 const reorder = <T,>(list: T[], startIndex: number, endIndex: number): T[] => {
   const result = Array.from(list);
@@ -12,25 +13,13 @@ const reorder = <T,>(list: T[], startIndex: number, endIndex: number): T[] => {
 };
 
 const CardQueue = () => {
-  const [items, setItems] = useState([{
-    id: '1',
-    name: 'Hellen Smith',
-    conditions: ['Diabetes', 'Asthma'],
-  }, {
-    id: '2',
-    name: 'John Doe',
-    conditions: ['Chronic Depression']
-  }, {
-    id: '3',
-    name: 'Jane Doe',
-    conditions: ['Thingy']
-  }]);
+  const { all, setAll } = useDataProvider();
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
     const { source, destination } = result;
-    setItems(reorder(items, source.index, destination.index));
+    setAll(reorder(all, source.index, destination.index));
   }
 
   return (
@@ -41,7 +30,7 @@ const CardQueue = () => {
             {...provided.droppableProps}
             ref={provided.innerRef}
           >
-            {items.map((item, index) => (
+            {all.map((item, index) => (
               <Draggable key={item.id} draggableId={item.id} index={index}>
                 {(provided) => (
                   <Card
