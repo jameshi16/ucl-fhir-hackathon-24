@@ -1,5 +1,73 @@
 import numpy as np
 import faiss
+import os
+import json
+
+
+class DBFiller:
+    def __init__(self):
+        self.patientDB = None
+        self.subfolders = os.listdir("SyntheticDenver")
+        self.condlist = []
+        self.obslist = []
+        self.pullData()
+
+    def getDataAsJson(self, filename):
+        with open(filename, encoding="utf-8") as f:
+            data = json.load(f)
+        return data
+
+    def pullData(self):
+        condSet = set()
+        obsSet = set()
+        for subF in self.subfolders:
+            for file in os.listdir("SyntheticDenver/" + subF):
+                fData = self.getDataAsJson(
+                    "SyntheticDenver/" + subF + "/" + file
+                )
+                for entry in fData["entry"]:
+                    if entry["resource"]["resourceType"] == "Condition":
+                        condSet.add(entry["resource"]["code"]["text"])
+                    if entry["resource"]["resourceType"] == "Observation":
+                        obsSet.add(entry["resource"]["code"]["text"])
+
+        self.condList = list(condSet)
+        self.obsList = list(obsSet)
+        self.condList.sort()
+        self.obsList.sort()
+
+    def fillDB(self):
+        self.patientDB = PatientVectorDB(
+            len(self.condList) + len(self.obsList)
+        )
+        for subF in self.subfolders:
+            for file in os.listdir("SyntheticDenver/" + subF):
+                fData = self.getDataAsJson(
+                    "SyntheticDenver/" + subF + "/" + file
+                )
+                patient_vector = np.zeros(
+                    len(self.condList) + len(self.obsList)
+                )
+                patient_id = fData["entry"][0]["resource"]["id"]
+                for entry in fData["entry"]:
+                    if entry["resource"]["resourceType"] == "Condition":
+                        index = self.condList.index(
+                            entry["resource"]["code"]["text"]
+                        )
+                        patient_vector[index] = 1
+                    if entry["resource"]["resourceType"] == "Observation":
+                        index = self.obsList.index(
+                            entry["resource"]["code"]["text"]
+                        )
+                        try:
+                            patient_vector[index + len(self.condList)] = entry[
+                                "resource"
+                            ]["valueQuantity"]["value"]
+                        except KeyError:
+                            patient_vector[index + len(self.condList)] = 1
+                self.patientDB.add_patient(patient_id, patient_vector)
+
+        return self.patientDB
 
 
 class PatientVectorDB:
@@ -33,12 +101,7 @@ class PatientVectorDB:
 
 
 vector_dim = 4  # Number of possible vitals / symptoms
-db = PatientVectorDB(vector_dim)
+dbFiller = DBFiller()
+db = dbFiller.fillDB()
 
-db.add_patient("P001", np.array([1, 0, 1, 0], dtype="float32"))
-db.add_patient("P002", np.array([0, 1, 1, 0], dtype="float32"))
-
-new_patient_vector = np.array([1, 0, 1, 1], dtype="float32")
-nearest_ids, distances = db.search_k_nearest(new_patient_vector, 1)
-
-print(f"Nearest patient IDs: {nearest_ids}, Distances: {distances}")
+print(db.search_k_nearest(np.array([1, 0, 0, 0]), 3))
