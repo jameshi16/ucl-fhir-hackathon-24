@@ -1,4 +1,7 @@
-class HealthCareData:
+from pydantic import BaseModel
+
+
+class HealthCareData(BaseModel):
 
     def __init__(self, id, name, conditions):
         self.id = id

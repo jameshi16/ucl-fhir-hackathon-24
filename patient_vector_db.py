@@ -135,8 +135,3 @@ class PatientVectorDB:
         pos = self.id_to_pos[patient_id]
         vector = self.index.reconstruct(pos)
         return self.search_k_nearest_vector(vector, k)
-
-
-vector_dim = 4  # Number of possible vitals / symptoms
-dbFiller = DBFiller()
-db = dbFiller.fillDB()

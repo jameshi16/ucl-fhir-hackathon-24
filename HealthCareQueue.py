@@ -1,4 +1,5 @@
 from HealthCareData import HealthCareData
+import random
 
 
 class HealthCareQueue:
@@ -10,6 +11,12 @@ class HealthCareQueue:
 
     def get_queue(self):
         return self.queue
+
+    def init_random_queue(self, num_patients):
+        ids = self.patient_db.patient_ids
+        random.shuffle(ids)
+        ids = ids[:num_patients]
+        self.queue = [self.patient_db.get_patient(id) for id in ids]
 
     def reorder_queue(self, id1, id2):
         self.queue[id1], self.queue[id2] = self.queue[id2], self.queue[id1]
